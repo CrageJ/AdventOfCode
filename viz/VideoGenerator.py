@@ -4,6 +4,7 @@ from collections import defaultdict
 from PIL import Image
 import utils
 import numpy as np
+import vizUtils
 
 
 class VideoGenerator:
@@ -17,7 +18,7 @@ class VideoGenerator:
         """
         self.name = name
 
-        self.colour_scheme = defaultdict(lambda:(0,0,0))
+        self.colour_scheme = defaultdict(lambda:vizUtils.DEFAULT_COLOUR)
         if colour_scheme:
             for k,v in colour_scheme.items():
                 self.colour_scheme[k] = v
