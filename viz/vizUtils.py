@@ -55,6 +55,54 @@ def alpha_to_array_img(char_array,char_colours,background_colour=None,spacing=1)
     return canvas
 
 
+def lerp_gradient(colors, t):
+    if not colors:
+        raise ValueError("Colors list cannot be empty")
+
+    if len(colors) == 1:
+        return colors[0]
+
+    # Clamp t to [0, 1]
+    t = max(0.0, min(1.0, t))
+
+    n = len(colors) - 1  # Number of segments
+    scaled_t = t * n
+    segment = int(scaled_t)
+
+    # Handle edge case where t = 1.0
+    if segment >= n:
+        return colors[-1]
+
+    # Get the two colors to interpolate between
+    c1 = colors[segment]
+    c2 = colors[segment + 1]
+
+    # Local interpolation factor within this segment
+    local_t = scaled_t - segment
+
+    # Linear interpolation for each channel
+    r = int(c1[0] + (c2[0] - c1[0]) * local_t)
+    g = int(c1[1] + (c2[1] - c1[1]) * local_t)
+    b = int(c1[2] + (c2[2] - c1[2]) * local_t)
+
+    return (r, g, b)
+
+import math
+def easing(x,lifespan): # uses sqrt(x) to ease between 1 and 0
+    if lifespan == 0:
+        raise ValueError("Lifespan cannot be zero")
+    if x <= 0:
+        return 0
+    if x >= lifespan:
+        return 1
+    sx = math.sqrt(x)
+    sl = math.sqrt(lifespan)
+    return sx/sl
+def lerp_gradient_eased(x,lifespan,gradient):
+    nx = easing(x,lifespan)
+    grad = lerp_gradient(gradient,nx)
+    return grad
+
 
 
 
