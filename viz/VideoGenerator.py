@@ -4,7 +4,8 @@ from collections import defaultdict
 from PIL import Image
 import utils
 import numpy as np
-import vizUtils
+from viz.vizUtils import DEFAULT_COLOUR
+
 
 
 class VideoGenerator:
@@ -18,7 +19,7 @@ class VideoGenerator:
         """
         self.name = name
 
-        self.colour_scheme = defaultdict(lambda:vizUtils.DEFAULT_COLOUR)
+        self.colour_scheme = defaultdict(lambda:DEFAULT_COLOUR)
         if colour_scheme:
             for k,v in colour_scheme.items():
                 self.colour_scheme[k] = v
@@ -60,11 +61,20 @@ class VideoGenerator:
         img = Image.fromarray(array, mode="RGB")
         self.frames.append(img)
 
-    def render_gif(self,millis=100): # secs per frame
-        self.frames[0].save(
+    def render_gif(self,millis=100,scale=1): # secs per frame
+        frames = self.frames
+        # Scale frames if needed
+        if scale != 1:
+            frames = []
+            for frame in self.frames:
+                new_size = (int(frame.width * scale), int(frame.height * scale))
+                scaled_frame = frame.resize(new_size, Image.NEAREST)
+                frames.append(scaled_frame)
+
+        frames[0].save(
             self.output_folder/f"{self.name}.gif",
             save_all=True,
-            append_images=self.frames[1:],
+            append_images=frames[1:],
             duration=millis,
             loop=0,
         )
