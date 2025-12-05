@@ -88,7 +88,7 @@ def lerp_gradient(colors, t):
     return (r, g, b)
 
 import math
-def easing(x,lifespan): # uses sqrt(x) to ease between 1 and 0
+def easing(x,lifespan,easetype): # uses sqrt(x) to ease between 1 and 0
     if lifespan == 0:
         raise ValueError("Lifespan cannot be zero")
     if x <= 0:
@@ -97,9 +97,22 @@ def easing(x,lifespan): # uses sqrt(x) to ease between 1 and 0
         return 1
     sx = math.sqrt(x)
     sl = math.sqrt(lifespan)
-    return sx/sl
-def lerp_gradient_eased(x,lifespan,gradient):
-    nx = easing(x,lifespan)
+    sxml = math.sqrt(lifespan-x)
+    if easetype == "sqrt_acc":
+        return sx/sl
+    elif easetype == "sqrt_deacc":
+        return -sxml/sl + 1
+    elif easetype == "sigmoid":
+        smooth_factor = 8
+        exp = (x-lifespan/2)
+        exp = -(smooth_factor/lifespan) *exp
+        e = math.exp(exp)
+        return 1/(1+e)
+
+    return x/lifespan # linear
+
+def lerp_gradient_eased(x,lifespan,gradient,easetype):
+    nx = easing(x,lifespan,easetype)
     grad = lerp_gradient(gradient,nx)
     return grad
 
